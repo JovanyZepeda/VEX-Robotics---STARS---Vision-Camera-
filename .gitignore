@@ -1,3 +1,14 @@
+# files to ignore from VEX Code Text Pro
+/.vscode
+/bin
+/build
+compile_commands.json
+
+
+
+
+
+# files to ingore for c++. Template from GITHUB.com
 # Prerequisites
 *.d
 
