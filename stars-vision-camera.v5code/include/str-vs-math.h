@@ -18,5 +18,13 @@ extern float VsCalculateDistanceToObject_mm(signature &sig_target);
 
 extern float VsCalculateTargetThetaFromCameraCenter(signature &sig_target);
 
+extern void VsDrawObjectOnBrain(signature &sig_target);
+
+extern void VsDisplayObjectStats();
+
+extern float  VsGetCenterY(signature &sig_target);
+
+extern float VsGetCenterX(signature &sig_target);
+
 #endif
 

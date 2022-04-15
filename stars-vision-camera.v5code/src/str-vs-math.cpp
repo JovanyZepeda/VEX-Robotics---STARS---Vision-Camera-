@@ -1,16 +1,18 @@
-#include "../str-vision-header/str-vs-math.h"
-#include "../str-vision-header/str-vs-config.h"
+#include "str-vs-math.h"
+#include "str-vs-config.h"
 #include "vex.h"
 
 using namespace vex;
 
 
 // Global Variables --------------------------
- const float g_vsMountHeight_mm = 457.0;
- const float g_vsHorDisplacenmentTheta_deg = -12.00;
- const float g_vsFOV_deg = 61/2; //https://www.vexforum.com/t/vision-sensor-fov-measurements/62397
+ const float g_vsMountHeight_mm = 445.0;
+ const float g_vsHorDisplacenmentTheta_deg = -25.00;
+ const float g_vsFOV_deg = 60/2; //https://www.vexforum.com/t/vision-sensor-fov-measurements/62397
 
 //functions ---------------------------------
+
+//Distance to Object
  float VsCalculateDistanceToObject_mm(signature &sig_target){
    // take a picture and search for blue object
     Vision1.takeSnapshot(SIG_BLUE);
@@ -30,7 +32,23 @@ using namespace vex;
    return targetDistance_mm;
 }
 
+//Get CenterY
+  float VsGetCenterY(signature &sig_target){
+    // take a picture and search for blue object
+    Vision1.takeSnapshot(sig_target);
 
+    return Vision1.largestObject.centerY;
+  }
+  //Get CenterX
+  float VsGetCenterX(signature &sig_target){
+    // take a picture and search for blue object
+    Vision1.takeSnapshot(sig_target);
+
+    return Vision1.largestObject.centerX;
+  }
+
+
+//Calculate Theta from center from camera
  float VsCalculateTargetThetaFromCameraCenter(signature &sig_target){
   //Take picture
   Vision1.takeSnapshot(sig_target);
@@ -53,7 +71,7 @@ using namespace vex;
     targetY_pixel = 0;
   }
 
-  //calculate angle of target from center of camera
+//calculate angle of target from center of camera
   float targetThetaFromCentertemp_deg = (180/M_PI) * atanf( (2*targetY_pixel/Ymax_Pixel) * tanf( (M_PI/180) * phiFOV_deg)  );
 
   //give the angle its sign
@@ -77,4 +95,20 @@ using namespace vex;
   return targetThetaFromCenter_deg;
 }
 
+
+void VsDrawObjectOnBrain(signature &sig_target){
+  //Take picture
+  Vision1.takeSnapshot(sig_target);
+
+  //Clear Screen
+  Brain.Screen.clearScreen();
+
+  //Draw Rectangle - BLUE Color
+  Brain.Screen.setFillColor(blue);
+  Brain.Screen.drawRectangle(Vision1.largestObject.originX, Vision1.largestObject.originY, Vision1.largestObject.width, Vision1.largestObject.height);
+ 
+
+ 
+
+}
 
