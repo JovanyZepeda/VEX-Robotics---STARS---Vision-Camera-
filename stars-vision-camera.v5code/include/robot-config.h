@@ -3,6 +3,8 @@ using signature = vision::signature;
 
 extern brain Brain;
 extern signature SIG_BLUE;
+extern signature SIG_RED;
+extern signature SIG_PURPLE;
 extern vision Vision1;
 extern controller Controller1;
 /**

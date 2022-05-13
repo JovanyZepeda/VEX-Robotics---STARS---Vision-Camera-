@@ -4,51 +4,107 @@
 
 using namespace vex;
 
+//Resrouces
+//https://docs.robotmesh.com/vex-iq-cpp-vision-guide 
+//
 
 // Global Variables --------------------------
- const float g_vsMountHeight_mm = 445.0;
- const float g_vsHorDisplacenmentTheta_deg = -25.00;
- const float g_vsFOV_deg = 60/2; //https://www.vexforum.com/t/vision-sensor-fov-measurements/62397
+ const float g_vsCameraHeight_mm = 305.0;
+ const float g_vsTheta_c_deg = 180-34.00;
+ const float g_vsFOV_deg = 41; //https://www.vexforum.com/t/vision-sensor-fov-measurements/62397
+ const float g_vsMaxYPixel_px = 400; //Maximum y pixel vertical legnth 
+
 
 //functions ---------------------------------
 
-//Distance to Object
- float VsCalculateDistanceToObject_mm(signature &sig_target){
+//Function: Distance to Object
+ float VsDistanceToObject_mm(signature &sig_target){
    // take a picture and search for blue object
-    Vision1.takeSnapshot(SIG_BLUE);
+    Vision1.takeSnapshot(sig_target);
    //local variables
-   float targetTheta_deg = VsCalculateTargetThetaFromCameraCenter(SIG_BLUE);
-   float targetTheta_rad =  (M_PI/180) * (g_vsHorDisplacenmentTheta_deg +  targetTheta_deg);
-   float objectHeight_mm = 160;
+    float l_vsObjectYPosition_px = Vision1.largestObject.centerY;
+
     
    //Calculate ditance
-   float targetDistance_mm = fabsf((g_vsMountHeight_mm - objectHeight_mm) / ( tanf(  targetTheta_rad ) )) ;
+    float l_vsTargetDistance_mm = -g_vsCameraHeight_mm * tanf( atanf( (tan(M_PI*g_vsFOV_deg/360) * (g_vsMaxYPixel_px - 2 * l_vsObjectYPosition_px)  ) / g_vsMaxYPixel_px ) - ( (M_PI/180) * g_vsTheta_c_deg) );
 
     //if no object detected, make 0
     if(Vision1.largestObject.exists == 0){
-      targetDistance_mm = 0;
+      l_vsTargetDistance_mm = 0;
     }
 
-   return targetDistance_mm;
-}
+   return l_vsTargetDistance_mm;
+  }
+//
 
-//Get CenterY
-  float VsGetCenterY(signature &sig_target){
+
+//Function: Distance to Object
+ float VsDistanceToObject_version2_mm(signature &sig_target){
+   // take a picture and search for blue object
+    Vision1.takeSnapshot(sig_target);
+   //local variables
+    float l_vsObjectYPosition_px = Vision1.largestObject.centerY;
+
+    
+   //Calculate ditance
+    float l_vsTargetDistance_mm = -g_vsCameraHeight_mm * tanf( atanf( g_vsMaxYPixel_px/2440 - l_vsObjectYPosition_px/1220 ) - (g_vsTheta_c_deg * M_PI/180) );
+
+    //if no object detected, make 0
+    if(Vision1.largestObject.exists == 0){
+      l_vsTargetDistance_mm = 0;
+    }
+
+   return l_vsTargetDistance_mm;
+  }
+//
+
+
+//Function: Distrance to an object. Select from an array.
+  float VsDistanceToObject_mm(signature &sig_target, int ObjectIndex){
+    //take a picture and search for blue object
+      Vision1.takeSnapshot(sig_target);
+    //local variables
+      float l_vsObjectYPosition_px = Vision1.objects[ObjectIndex].centerY;
+
+      
+    //Calculate distance
+      float l_vsTargetDistance_mm = -g_vsCameraHeight_mm * tanf( atanf( (tan(M_PI*g_vsFOV_deg/360) * (g_vsMaxYPixel_px - 2 * l_vsObjectYPosition_px)  ) / g_vsMaxYPixel_px ) - ( (M_PI/180) * g_vsTheta_c_deg) );
+
+
+
+    return l_vsTargetDistance_mm;
+  }
+//
+
+//Function: Get CenterY
+  float VsGetCenterY_px(signature &sig_target){
     // take a picture and search for blue object
     Vision1.takeSnapshot(sig_target);
 
     return Vision1.largestObject.centerY;
   }
+//
+
+//Funcition: Get CenterY From an Array
+  float  VsGetCenterY_px(signature &sig_target, int ObjectIndex){
+    // take a picture and search for blue object
+    Vision1.takeSnapshot(sig_target);
+
+    return Vision1.objects[ObjectIndex].centerY;
+  }
+
   //Get CenterX
-  float VsGetCenterX(signature &sig_target){
+  float VsGetCenterX_Largest_px(signature &sig_target){
     // take a picture and search for blue object
     Vision1.takeSnapshot(sig_target);
 
     return Vision1.largestObject.centerX;
   }
+//
+  
 
 
-//Calculate Theta from center from camera
+//Function: Calculate Theta from center from camera
  float VsCalculateTargetThetaFromCameraCenter(signature &sig_target){
   //Take picture
   Vision1.takeSnapshot(sig_target);
@@ -71,7 +127,7 @@ using namespace vex;
     targetY_pixel = 0;
   }
 
-//calculate angle of target from center of camera
+//Function: calculate angle of target from center of camera
   float targetThetaFromCentertemp_deg = (180/M_PI) * atanf( (2*targetY_pixel/Ymax_Pixel) * tanf( (M_PI/180) * phiFOV_deg)  );
 
   //give the angle its sign
@@ -93,22 +149,36 @@ using namespace vex;
 
 
   return targetThetaFromCenter_deg;
-}
+  }
 
+//Function: Draw on screen
+  void VsDrawObjectOnBrain(signature &sig_target){
+    //Take picture
+    Vision1.takeSnapshot(sig_target);
 
-void VsDrawObjectOnBrain(signature &sig_target){
-  //Take picture
-  Vision1.takeSnapshot(sig_target);
+    //Clear Screen
+    Brain.Screen.clearScreen();
 
-  //Clear Screen
-  Brain.Screen.clearScreen();
+    //Draw Rectangle - BLUE Color
+    Brain.Screen.setFillColor(blue);
+    Brain.Screen.drawRectangle(Vision1.largestObject.originX, Vision1.largestObject.originY, Vision1.largestObject.width, Vision1.largestObject.height);
 
-  //Draw Rectangle - BLUE Color
-  Brain.Screen.setFillColor(blue);
-  Brain.Screen.drawRectangle(Vision1.largestObject.originX, Vision1.largestObject.originY, Vision1.largestObject.width, Vision1.largestObject.height);
- 
+  }
+//
 
- 
+//Function: Draw on screen. all objects from array
+  void VsDrawObjectOnBrain(signature &sig_target, const color &sig_color){
+      //Take picture
+      Vision1.takeSnapshot(sig_target);
 
-}
+      //Clear Screen
+      Brain.Screen.clearScreen();
 
+      for(int j = 0; j < Vision1.objectCount+1; j++){
+        //Draw Rectangle - BLUE Color
+        Brain.Screen.setFillColor(sig_color);
+        Brain.Screen.drawRectangle(Vision1.objects[j].originX, Vision1.objects[j].originY, Vision1.objects[j].width, Vision1.objects[j].height);
+        //
+      }
+  }
+//
