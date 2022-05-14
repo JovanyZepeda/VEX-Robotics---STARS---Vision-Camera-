@@ -18,19 +18,29 @@ extern float VsDistanceToObject_mm(signature &sig_target);
 
 extern float VsDistanceToObject_version2_mm(signature &sig_target);
 
+extern float VsDistanceToObject_version3_mm(signature &sig_target);
+
 extern float VsDistanceToObject_mm(signature &sig_target, int ObjectIndex);
 
 extern float VsCalculateTargetThetaFromCameraCenter(signature &sig_target);
+
+///
 
 extern void VsDrawObjectOnBrain(signature &sig_target);
 
 extern void VsDrawObjectOnBrain(signature &sig_target, const color &sig_color);
 
+//
+
 extern void VsDisplayObjectStats();
+
+//
 
 extern float  VsGetCenterY_px(signature &sig_target);
 
 extern float  VsGetCenterY_px(signature &sig_target, int ObjectIndex);
+
+//
 
 extern float VsGetCenterX_px(signature &sig_target);
 

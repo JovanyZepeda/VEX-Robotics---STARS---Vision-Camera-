@@ -13,7 +13,8 @@ using namespace vex;
  const float g_vsTheta_c_deg = 180-34.00;
  const float g_vsFOV_deg = 41; //https://www.vexforum.com/t/vision-sensor-fov-measurements/62397
  const float g_vsMaxYPixel_px = 400; //Maximum y pixel vertical legnth 
-
+ const float g_vsMaxXPixel_px = 212; //Maximum X pixel Count
+ const float g_vsHorFov_deg = 61;
 
 //functions ---------------------------------
 
@@ -94,7 +95,7 @@ using namespace vex;
   }
 
   //Get CenterX
-  float VsGetCenterX_Largest_px(signature &sig_target){
+  float VsGetCenterX_px(signature &sig_target){
     // take a picture and search for blue object
     Vision1.takeSnapshot(sig_target);
 

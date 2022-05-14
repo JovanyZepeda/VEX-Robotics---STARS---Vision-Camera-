@@ -23,6 +23,7 @@ int main() {
   float distance_t = 0;
   float distanceSum = 0;
   float centerYObjectSum = 0;
+  float CenterXSum = 0;
 
 
   while(true){
@@ -48,14 +49,17 @@ int main() {
     //get average of 10 distance samples - Largest object - Version 2
       if(Controller1.ButtonY.pressing()){
         
-        distance_t = (VsDistanceToObject_version2_mm(SIG_PURPLE) ); //Get distance and convert to cm
-        centerYObjectSum = VsGetCenterY_px(SIG_PURPLE);
-        
-
-        printf("\nDistance Average: %4.3f  | CenterY Average: %4.3f  | Object count: %4.3ld", distance_t, centerYObjectSum, Vision1.objectCount); //Divide by 10 to get an average
+          for(int i = 0; i < 10; i++){
+          distance_t = (VsDistanceToObject_mm(SIG_PURPLE)); //Get distance and convert to cm
+          CenterXSum += VsGetCenterX_px(SIG_PURPLE); // Add all the distance
+          centerYObjectSum += VsGetCenterY_px(SIG_PURPLE);
+        } 
+              
+        printf("\nCenterX Average: %4.3f  | CenterY Average: %4.3f  | Object count: %4.3ld", CenterXSum/10, centerYObjectSum/10, Vision1.objectCount); //Divide by 10 to get an average
       
         distance_t = 0;
         centerYObjectSum = 0;
+        CenterXSum = 0;
 
       } 
     //
